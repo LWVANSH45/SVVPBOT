@@ -42,13 +42,25 @@ def db():
     conn.execute("PRAGMA foreign_keys = ON")
     return conn
 
+import os
+
 def init_db():
+    if os.path.exists(DB_PATH):
+        try:
+            conn = sqlite3.connect(DB_PATH)
+            conn.execute("SELECT name FROM sqlite_master LIMIT 1")
+            conn.close()
+        except sqlite3.DatabaseError:
+            os.remove(DB_PATH)
+            print("Corrupted database removed.")
+
     conn = db()
     conn.executescript("""
     CREATE TABLE IF NOT EXISTS subjects (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT UNIQUE
     );
+
     CREATE TABLE IF NOT EXISTS chapters (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         subject_id INTEGER,
@@ -56,6 +68,7 @@ def init_db():
         UNIQUE(subject_id, name),
         FOREIGN KEY(subject_id) REFERENCES subjects(id)
     );
+
     CREATE TABLE IF NOT EXISTS videos (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         chapter_id INTEGER,
@@ -66,6 +79,7 @@ def init_db():
     );
     """)
     conn.commit()
+    conn.close()
     conn.close()
 
 # ========== HELPERS ==========
