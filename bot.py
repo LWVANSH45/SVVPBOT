@@ -20,6 +20,7 @@ usable file_id for that video. Turn that restriction off in that chat
 (or download+reupload the video to the bot) if forwarding doesn't work.
 """
 
+import asyncio
 import sqlite3
 import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
